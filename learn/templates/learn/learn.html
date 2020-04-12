@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block page_header %}
+    <h3>Learn</h3>
+{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+
+<script>
+    window.onload = function() {
+        function call_ajax(f){
+            let csrftoken = $("[name=csrfmiddlewaretoken]").val();
+            const query = document.getElementById("learn_text").value;
+            const data = {query: query}
+            console.log(data)
+            $.ajax({
+                url: '{% url "learn:home" %}',
+                data: data,
+                type: 'POST',
+                headers: {'X-CSRFToken': csrftoken},
+                success: f,
+                error: function(error) {
+                    console.log(error);
+                }
+            });
+        }
+
+        function server_response(response) {
+            const r = JSON.parse(response);
+            console.log(r);
+            // let babysitters = document.getElementById("babysitters");
+            $("#babysitters").html("");
+            r.forEach(element => {
+                $("#babysitters").append(
+                    '<div class="card w-50">'+
+                        '<iframe width="320" height="315"'+
+                            'src="https://www.youtube.com/embed/'+ element.id +'">'+
+                        '</iframe>'+
+                    '</div>'
+                );
+            });
+        }
+
+        document.getElementById("search_form").addEventListener("submit", function(e) {
+            e.preventDefault();
+            call_ajax(server_response);
+        });
+    }
+    </script>
+
+    <div class="container">
+        <form action="" method="post" class="align-items-center" id="search_form">
+            {% csrf_token %}
+            <input type="text" name="query" id="learn_text">
+            <input type="submit" value="Search">
+        </form>
+        <div id="babysitters" class="col-md-12 text-center">
+    
+        <div class="row mt-5">
+                <div class="col align-self-center mt-5 ml-5">
+                    <img src="{% static '/svg/search_illust.svg' %}" alt="" height="195" width="360">
+                </div>
+            </div>
+            <div class="row mt-5">
+                <div class="col align-self-center mt-5 mr-5">
+                    <h3>Search anything you want to learn</h3>
+                </div>
+            </div>
+        
+    </div>
+        
+    </div>
+</div>
+    {% endblock %}
+
+{% block auth_button %}
+<form action="{% url 'accounts:logout' %}" method="post">
+    {% csrf_token %}
+<button class="btn btn-danger ml-auto" type="submit">Logout</button>
+</form>
+{% endblock %}
+
+{% block navigation %}
+    <li class="nav-item">
+    <a class="nav-link" href="{% url 'home:home' %}">Home</a>
+    </li>
+    <li class="nav-item">
+    <a class="nav-link" href="{% url 'childcare:home' %}">Babysitters</a>
+    </li>
+    <li class="nav-item active">
+    <a class="nav-link" href="{% url 'learn:home' %}">Skills <span class="sr-only">(current)</span></a>
+    </li>
+    <li class="nav-item">
+    <a class="nav-link" href="{% url 'connect:home' %}">Connect</a>
+    </li>
+{% endblock %}
