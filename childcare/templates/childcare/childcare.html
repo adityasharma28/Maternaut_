@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block page_header %}
+    <h3>Babysitters</h3>
+{% endblock %}
+{% block content %}
+{% csrf_token %}
+
+<script>
+    window.onload = function() {
+        function call_ajax(f){
+            let csrftoken = $("[name=csrfmiddlewaretoken]").val();
+            const city = document.getElementById("childcare_text").value;
+            const data = {city: city}
+            console.log(data)
+            $.ajax({
+                url: '{% url "childcare:home" %}',
+                data: data,
+                type: 'POST',
+                headers: {'X-CSRFToken': csrftoken},
+                success: f,
+                error: function(error) {
+                    console.log(error);
+                }
+            });
+        }
+
+        function server_response(response) {
+            const r = JSON.parse(response);
+            console.log(r);
+            // let babysitters = document.getElementById("babysitters");
+            $("#babysitters").html("");
+            r.forEach(element => {
+                $("#babysitters").append(
+                    '<div class="d-flex justify-content-center">'+
+                    '<div class="card w-50">'+
+                    '<div class="card-body">'+
+                    '<h5 class="card-title">'+ element.name.lng_cont_name +'</h5>'+
+                    '<a href="'+ element.link +'" class="btn btn-primary">Know More</a>'+
+                    '</div></div></div>'
+                );
+            });
+        }
+
+        document.getElementById("search_form").addEventListener("submit", function(e) {
+            e.preventDefault();
+            call_ajax(server_response);
+        });
+    }
+</script>
+
+
+<div class="container">
+    <form action="" method="post" id="search_form">
+        {% csrf_token %}
+        <input type="text" name="city" id="childcare_text" value="" placeholder="Enter City"> 
+        <input type="submit" value="Search" class="ml-2 mb-4" id="childcare_search">
+    </form>
+    <div id="babysitters" class="text-center">
+    <div class="row mt-5">
+        <div class="col align-self-center mt-5 ml-5">
+            <img src="{% static '/svg/search_illust.svg' %}" alt="" height="195" width="360">
+        </div>
+    </div>
+    <div class="row mt-5">
+            <div class="col align-self-center mt-5 mr-5">
+                <h3>Search city to find the local babysitters</h3>
+            </div>
+        </div>
+</div>
+</div>
+{% endblock %}
+
+{% block auth_button %}
+<form action="{% url 'accounts:logout' %}" method="post">
+    {% csrf_token %}
+<button class="btn btn-danger ml-auto" type="submit">Logout</button>
+</form>
+{% endblock %}
+
+{% block navigation %}
+    <li class="nav-item ">
+    <a class="nav-link" href="{% url 'home:home' %}">Home</a>
+    </li>
+    <li class="nav-item active">
+    <a class="nav-link" href="{% url 'childcare:home' %}">Babysitters <span class="sr-only">(current)</span></a>
+    </li>
+    <li class="nav-item ">
+    <a class="nav-link" href="{% url 'learn:home' %}">Skills </a>
+    </li>
+    <li class="nav-item">
+    <a class="nav-link" href="{% url 'connect:home' %}">Connect</a>
+    </li>
+{% endblock %}

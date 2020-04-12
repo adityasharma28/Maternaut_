@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block page_header %}
+<h3>Create Account</h3>
+{% endblock %}
+{% block content %}
+<script>
+    window.onload = function() {
+        document.getElementById('id_username').setAttribute('placeholder', 'Enter a Username');
+        document.getElementById('id_password1').setAttribute('placeholder', 'Password');
+        document.getElementById('id_password2').setAttribute('placeholder', 'Confirm Password');
+    }
+</script>
+    
+    <div class="row text-center">
+        <div class="col align-self-center">
+            <img src="{% static '/svg/signup_illust.svg' %}" alt="" style="height: 280px; width: 480px;">
+        </div>
+        </div>
+
+    <form action="/accounts/signup/" method="post" class="site-form mt-5 h-100">
+        {% csrf_token %}
+        {{ form }}
+        <input type="submit" value="Signup">
+    </form>
+{% endblock %}
+
+{% block auth_button %}
+<a class="btn btn-primary ml-auto" role="button" href="{% url 'accounts:login' %}">Sign In</a>
+{% endblock %}
